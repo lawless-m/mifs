@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html><head>
+<script type='module' src='/mj/mifs.js'></script>
+<link rel='stylesheet' type='text/css' href='/mj/mifs.css'>
+</head>
+<body>
+
+<div style="float:left; padding-top:5px">
+	<div>
+	<div id="ibuttons"></div>
+	<div id="imagine" contenteditable="true" spellcheck="false" style="width:300px;height:300px; border:1px black solid;"></div>
+	</div>
+
+	<div>
+	<div id="tbuttons"></div>
+	<div id="tags" contenteditable="true" spellcheck="false" style="width:300px; border:1px black solid; margin-top:5px;">
+	</div>
+	</div>
+</div>
+
+<div id="tabs">
+
+	<button class="tablinks" data-tgt="styles">Styles</button>
+	<button class="tablinks" data-tgt="mifs">Mifs</button>
+	<button class="tablinks" data-tgt="describes">Describes</button>
+  </div>
+
+  	<div id="styles" style="overflow-x: auto;" class="col tabcontent"></div>
+
+	<div id="mifs" style="overflow-x: auto;" class="col tabcontent"></div>
+
+	<div id="describes" style="overflow-x: auto;" class="col tabcontent"></div>
+
+</div>
+

@@ -1,0 +1,27 @@
+.col {
+        border:1px black solid;
+        width:430px;
+        height:600p
+        padding:5px;
+        margin:5px;
+        float: left;
+}
+
+.img { 
+        width:200px;
+        float:left;
+        margin:2px;
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  top: 88%;
+  left: 5%;
+  color: white;
+  background-color: rgba(0,0,0,0.5); 
+}
+
+
+
+
