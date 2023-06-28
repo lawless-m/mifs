@@ -1,22 +1,21 @@
 #!/usr/bin/bash
 
-while read -r dir file; do
-  
-  echo $dir $file
+newimage() {
+    if [[ $1 == *.webp ]]; then
+        jpgthumb 200x200 $1
+    elif [[ $1 == *.webp.jpg ]]; then
+        echo -n
+    else
+        img2ext $1 webp
+    fi
+}
 
+while read -r dir file; do
   (
     cd $dir
-    if [ $dir = describes ]; then
-        echo describes
-    else
-        if [[ $file == *.filepart ]]; then    
-            echo -n
-        elif [[ $file == *.webp ]]; then
-            jpgthumb 200x200 $file
-        elif [[ $file == *.webp.jpg ]]; then
-            echo tumb done
-        else
-            img2ext $file webp
+    if [[ $file != *.filepart ]]; then
+        if [[ `file -b --mime-type $file` == image/* ]]; then
+            newimage $file
         fi
     fi
   )

@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+tr -d '\r\357\270\217\342\203\243\223"' | 
+tr '\200' '-' | 
+tr '\224' ',' | 
+sed -E -e 's/^ +//' -e 's/ +$//' -e 's/^[1234] +//' | 
+grep -v '^$' | 
+awk ' BEGIN { printf("["); com=""} { printf("%s\"%s\"", com, $0); com="," } END { printf("]") } '
+

@@ -18,7 +18,7 @@ function cpy() {
    let imagine = "";
    imagine += args.filter(t => { return t.startsWith('https://') }).join(' ');
    const iw = imagine == "" ? '' : ' --iw 1';
-   imagine += " " + args.filter(t => { return !t.startsWith('https://') }).map(s => `${s}::1`).join(' ') + iw + " --chaos 0";
+   imagine += " " + args.filter(t => { return !t.startsWith('https://') }).map(s => `${s}::1`).join(' ') + iw + " --chaos 50";
    navigator.clipboard.writeText(imagine);
    return false;
 }
@@ -88,55 +88,77 @@ function describe(evt) {
     } else {
         desc.innerText += style + '\n';
     }
-	
     return false;
 }
 
 function fill_images(data, dir) {
     const dv = byId(dir);
-    data.map(i => {
-        let lable;
-        let style;
-        let im = {src:`${dir}/${i}.webp.jpg`, i:`${dir}/${i}.webp`}
-        if(dir == 'mifs') {
-            style = `https://steponnopets.net/mj/mifs/${i}.webp`;
-            lable = i;
-        } else {
-            style = i.replace(/_/g, " ").replace(/^ +/, "");
-            lable = style.replace(/^by /, "")
-                .replace(/^a painting by /, "")
-                .replace(/^in the style of /, "");
-        }
-        im.l = lable;
-        im.s = style;
-        return im;
-    })
-    .sort((a, b) => a.l.localeCompare(b.l))
-    .map(i=>{
-        const im = img(i.src, i.s);
-        im.onclick = describe;	
-        im.setAttribute('data-i', i.i);
-        if(i.s.startsWith('https:')) {
-            im.setAttribute('data-l', '');
-        } else {
-            im.setAttribute('data-l', i.l);
-        }
-        im.setAttribute('data-s', i.s);
-        return im;
-    })
+    data.map(name => { return tagged(dir, name) })
+    .sort((a, b) => a.label.localeCompare(b.label))
+    .map(mifimg)
     .forEach( im => {
         let idiv = div({class:'img'}, im);
-        let lable = im.getAttribute('data-l');
-        if(lable != '') {
-            idiv.append(div({class:'overlay'}, lable));
+        let label = im.getAttribute('data-l');
+        if(label != '') {
+            idiv.append(div({class:'overlay'}, label));
         }
         dv.append(idiv);
     });
 }
 
+function tagged(dir, name) {
+    const tags = {dir:dir, name:name}
+    switch(dir){
+    case 'mifs':
+        tags.style = `https://steponnopets.net/mj/${dir}/${name}.webp`;
+        tags.label = '';
+        break;
+    case 'describes':
+        tags.style = `https://steponnopets.net/mj/${dir}/${name}.webp`;
+
+        break;
+    case 'styles':
+        tags.style = name.replace(/_/g, " ").replace(/^ +/, "");
+        tags.label = tags.style.replace(/^by /, "")
+            .replace(/^a painting by /, "")
+            .replace(/^in the style of /, "");
+    }
+    return tags;
+}
+
+function mifimg(tags) {
+    const full = `${tags.dir}/${tags.name}.webp`;
+    const thumb = `${tags.dir}/${tags.name}.webp.jpg`;
+    const im = img(thumb, tags.style);
+    im.onclick = describe;	
+    im.setAttribute('data-i', full);
+    im.setAttribute('data-l', tags.label);
+    im.setAttribute('data-s', tags.style);
+    return im;
+}
+
+function desc2styles(desc) {
+    return desc.split(' --')[0].split(', ').join('\n')
+}
+
+function fill_describes(data) {
+    const tab = table({});
+    for (const [t, ds] of Object.entries(data)) {
+        const row = tr({valign:'middle'}, [
+            td({align:'center'}, mifimg({dir:'describes', name:t, style:`https://steponnopets.net/mj/describes/${t}.webp`, label:''})),
+            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d1`, style:desc2styles(ds[0]), label:''})),
+            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d2`, style:desc2styles(ds[1]), label:''})),
+            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d3`, style:desc2styles(ds[2]), label:''})),
+            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d4`, style:desc2styles(ds[3]), label:''}))
+        ])
+        tab.append(row);
+    }
+    byId('describes').append(tab)
+}
+
 function resize_imgpanes() {
     const dw = (window.innerWidth - 350) + 'px';
-    ['mifs', 'styles'].forEach(dv => {
+    ['mifs', 'styles', 'describes'].forEach(dv => {
         byId(dv).style.width = dw;
         byId(dv).style.height = (window.innerHeight - 50) + 'px';
     });
@@ -175,17 +197,17 @@ function pop_hashtag(evt) {
 function pop_imagine(evt) {
     const tag = pop_tag(evt);
     if(tag.startsWith('https://')) {
-	window.open(tag);
+	    window.open(tag);
     } else {
-	window.open(`https://steponnopets.net/mj/styles/${tag.replace(' ', '_')}.webp`);
+	    window.open(`https://steponnopets.net/mj/styles/${tag.replace(' ', '_')}.webp`);
     }
-
 }
 
 function fetch_imgs() {
     ['mifs', 'styles'].forEach(dir => {
         fetchJson(`ls.cgi?dir=${dir}`, data => { fill_images(data, dir) });
     });
+    fetchJson(`ls.cgi?dir=describes`, data => { fill_describes(data) });
     resize_imgpanes();
 }
 
