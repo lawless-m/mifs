@@ -156,9 +156,16 @@ function fill_describes(data) {
     byId('describes').append(tab)
 }
 
+function fill_untested(data) {
+    const d = byId('untested')
+    data.forEach(f => {
+        d.append(img(`untested/${f}`, f));
+    })
+}
+
 function resize_imgpanes() {
     const dw = (window.innerWidth - 350) + 'px';
-    ['mifs', 'styles', 'describes'].forEach(dv => {
+    ['mifs', 'styles', 'describes', 'untested'].forEach(dv => {
         byId(dv).style.width = dw;
         byId(dv).style.height = (window.innerHeight - 50) + 'px';
     });
@@ -208,6 +215,7 @@ function fetch_imgs() {
         fetchJson(`ls.cgi?dir=${dir}`, data => { fill_images(data, dir) });
     });
     fetchJson(`ls.cgi?dir=describes`, data => { fill_describes(data) });
+    fetchJson(`ls.cgi?dir=untested`, data => { fill_untested(data) });
     resize_imgpanes();
 }
 

@@ -1,12 +1,12 @@
-#!/usr/bin/bash
+#!/usr/bin/bash -x
 
 newimage() {
     if [[ $1 == *.webp ]]; then
-        jpgthumb 200x200 $1
+       jpgthumb 200x200 $1
     elif [[ $1 == *.webp.jpg ]]; then
         echo -n
     else
-        img2ext $1 webp
+       jpgthumb 200x200 `img2ext $1 webp 2>&1`
     fi
 }
 
@@ -14,8 +14,9 @@ while read -r dir file; do
   (
     cd $dir
     if [[ $file != *.filepart ]]; then
+	sleep 1
         if [[ `file -b --mime-type $file` == image/* ]]; then
-            newimage $file
+            newimage $file 
         fi
     fi
   )
