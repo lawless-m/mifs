@@ -159,7 +159,12 @@ function fill_describes(data) {
 function fill_untested(data) {
     const d = byId('untested')
     data.forEach(f => {
-        d.append(img(`untested/${f}`, f));
+        const im = img(`untested/${f}`, f);
+        im.style.maxWidth = '300px';
+        im.style.maxHeight = '300px';
+        im.style.width = 'auto';
+        im.style.height = 'auto';
+        d.append(im);
     })
 }
 
