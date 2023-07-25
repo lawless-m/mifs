@@ -22,7 +22,11 @@ IFS='&'
 for param in $QUERY_STRING; do
 	if [[ "$param" == dir=* ]]; then
 		dir=`basename ${param#*=}`
-		if [[ $dir == describes ]]; then
+		if [[ $dir == chika ]]; then
+			( describes $dir )
+		elif [[ $dir == rooms ]]; then
+			( describes $dir )
+		elif [[ $dir == objects ]]; then
 			( describes $dir )
 		elif [[ $dir == untested ]]; then 
 			( untested $dir )

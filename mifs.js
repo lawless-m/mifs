@@ -91,7 +91,7 @@ function describe(evt) {
     return false;
 }
 
-function fill_images(data, dir) {
+function fill_images(dir, data) {
     const dv = byId(dir);
     data.map(name => { return tagged(dir, name) })
     .sort((a, b) => a.label.localeCompare(b.label))
@@ -113,9 +113,10 @@ function tagged(dir, name) {
         tags.style = `https://steponnopets.net/mj/${dir}/${name}.webp`;
         tags.label = '';
         break;
-    case 'describes':
+    case 'chika':
+    case 'rooms':
+    case 'objects':
         tags.style = `https://steponnopets.net/mj/${dir}/${name}.webp`;
-
         break;
     case 'styles':
         tags.style = name.replace(/_/g, " ").replace(/^ +/, "");
@@ -141,19 +142,19 @@ function desc2styles(desc) {
     return desc.split(' --')[0].split(', ').join('\n')
 }
 
-function fill_describes(data) {
+function fill_describes(dir, data) {
     const tab = table({});
     for (const [t, ds] of Object.entries(data)) {
         const row = tr({valign:'middle'}, [
-            td({align:'center'}, mifimg({dir:'describes', name:t, style:`https://steponnopets.net/mj/describes/${t}.webp`, label:''})),
-            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d1`, style:desc2styles(ds[0]), label:''})),
-            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d2`, style:desc2styles(ds[1]), label:''})),
-            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d3`, style:desc2styles(ds[2]), label:''})),
-            td({align:'center'}, mifimg({dir:'describes', name:`${t}_d4`, style:desc2styles(ds[3]), label:''}))
+            td({align:'center'}, mifimg({dir:dir, name:t, style:`https://steponnopets.net/mj/${dir}/${t}.webp`, label:''})),
+            td({align:'center'}, mifimg({dir:dir, name:`${t}_d1`, style:desc2styles(ds[0]), label:''})),
+            td({align:'center'}, mifimg({dir:dir, name:`${t}_d2`, style:desc2styles(ds[1]), label:''})),
+            td({align:'center'}, mifimg({dir:dir, name:`${t}_d3`, style:desc2styles(ds[2]), label:''})),
+            td({align:'center'}, mifimg({dir:dir, name:`${t}_d4`, style:desc2styles(ds[3]), label:''}))
         ])
         tab.append(row);
     }
-    byId('describes').append(tab)
+    byId(dir).append(tab)
 }
 
 function fill_untested(data) {
@@ -170,7 +171,7 @@ function fill_untested(data) {
 
 function resize_imgpanes() {
     const dw = (window.innerWidth - 350) + 'px';
-    ['mifs', 'styles', 'describes', 'untested'].forEach(dv => {
+    ['mifs', 'styles', 'chika', 'rooms', 'objects', 'untested'].forEach(dv => {
         byId(dv).style.width = dw;
         byId(dv).style.height = (window.innerHeight - 50) + 'px';
     });
@@ -217,10 +218,12 @@ function pop_imagine(evt) {
 
 function fetch_imgs() {
     ['mifs', 'styles'].forEach(dir => {
-        fetchJson(`ls.cgi?dir=${dir}`, data => { fill_images(data, dir) });
+        fetchJson(`ls.cgi?dir=${dir}`, data => { fill_images(dir, data); });
     });
-    fetchJson(`ls.cgi?dir=describes`, data => { fill_describes(data) });
-    fetchJson(`ls.cgi?dir=untested`, data => { fill_untested(data) });
+    ['chika', 'rooms', 'objects'].forEach(dir => {
+        fetchJson(`ls.cgi?dir=${dir}`, data => { fill_describes(dir, data); });    
+    })
+    fetchJson(`ls.cgi?dir=untested`, data => { fill_untested(data); });
     resize_imgpanes();
 }
 
